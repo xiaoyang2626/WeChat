@@ -38,7 +38,9 @@ def GetMessage():
     # result = {'xml': {'ToUserName': dictdata['xml']['FromUserName'], 'FromUserName': dictdata['xml']['ToUserName'], 'CreateTime': str(
     #     int(round(time.time() * 1000))), 'MsgType': 'text', 'Content': 'Hello World'}}
     # print(xmltodict.unparse(result))
+    
     msg=EntityAccess.weixin.message(request.data)
+    print(msg.getDicdata())
     msg.receive()
     return msg.answer()
 @app.route('/wechat', methods=['GET'])

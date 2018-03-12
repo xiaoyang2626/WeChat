@@ -41,7 +41,8 @@ class message(object):
             self.__Content=self.__dicdata['xml']['Content']
         elif self.__MsgType=='voice':
             self.__Recognition=self.__dicdata['xml']['Recognition']
-            
+    def getDicdata(self):
+        return self.__dicdata
     def answer(self):
         try:
             if self.__MsgType == 'text':
