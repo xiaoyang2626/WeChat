@@ -11,17 +11,26 @@ logging.basicConfig(level=logging.DEBUG,
                     filemode='a')
 import pinyin
 import xmltodict
+# APPSecret='a243dcea5386e1842a0069e4bc0bd2ad'
 class sign(object):
     #服务器信息验证接收信息[signature,timestamp,nonce,echostr]
     def authtoken(self,signature,timestamp,nonce,echostr):
         try:
             data = ['15900253421xiaoyangYHC', timestamp, nonce]
             data.sort()
-            sha1 = hashlib.sha1()
-            for item in data:
-                sha1.update(item.encode('utf-8'))
-            hashcode = sha1.hexdigest()
-            if hashcode == signature:
+            # sha1 = hashlib.sha1()
+            # for item in data:
+            #     sha1.update(item.encode('utf-8'))
+            # hashcode = sha1.hexdigest()
+            # if hashcode == signature:
+            #     return echostr
+            # else:
+            #     return ''
+            data2=''.join(data)
+            sha1=hashlib.sha1()
+            sha1.update(data2.encode('utf-8'))
+            hashcode=sha1.hexdigest()
+            if hashcode==signature:
                 return echostr
             else:
                 return ''

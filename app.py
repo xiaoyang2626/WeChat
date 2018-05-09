@@ -23,7 +23,9 @@ app.secret_key = os.urandom(12)
 @app.route('/', methods=['GET'])
 def home():
     return render_template('helloword.html')
-
+@app.route('/hudong',methods=['GET'])
+def hudong():
+    return render_template('index.html')
 
 @app.route('/wechat', methods=['POST'])
 def GetMessage():
@@ -38,10 +40,11 @@ def GetMessage():
     # result = {'xml': {'ToUserName': dictdata['xml']['FromUserName'], 'FromUserName': dictdata['xml']['ToUserName'], 'CreateTime': str(
     #     int(round(time.time() * 1000))), 'MsgType': 'text', 'Content': 'Hello World'}}
     # print(xmltodict.unparse(result))
-    
+
     msg=EntityAccess.weixin.message(request.data)
-    print(msg.getDicdata())
+
     msg.receive()
+    
     return msg.answer()
 @app.route('/wechat', methods=['GET'])
 def auth():
@@ -55,6 +58,18 @@ def auth():
 
     # return render_template('weixinsign.html',signature=signature)
     return result
+@app.route('/testwechat', methods=['GET'])
+def testauth():
+    signature = request.args.get('signature')
+    timestamp = request.args.get('timestamp')
+    nonce = request.args.get('nonce')
+    echostr = request.args.get('echostr')
+    wxsign = EntityAccess.weixin.sign()
+    result = wxsign.authtoken(str(signature), str(timestamp), str(nonce), str(echostr))
+    print('result'+str(result))
+
+    # return render_template('weixinsign.html',signature=signature)
+    return result    
 
 if __name__ == '__main__':
     http_server=WSGIServer(('0.0.0.0', 8080), app)
