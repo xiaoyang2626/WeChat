@@ -7,8 +7,8 @@ logging.basicConfig(level=logging.DEBUG,
                     datefmt='%Y-%m-%d %H:%M:%S',
                     filename='app.log',
                     filemode='a')
-# import EntityAccess.Entites
-import EntityAccess.weixin
+# import Access.Entites
+# import Access.weixin
 import xmltodict
 from flask import Flask, request, render_template, redirect, url_for, escape, session, jsonify
 from gevent import monkey
@@ -43,7 +43,7 @@ def GetMessage():
     #     int(round(time.time() * 1000))), 'MsgType': 'text', 'Content': 'Hello World'}}
     # print(xmltodict.unparse(result))
 
-    msg = EntityAccess.weixin.message(request.data)
+    msg = Access.weixin.message(request.data)
 
     msg.receive()
 
@@ -56,7 +56,7 @@ def auth():
     timestamp = request.args.get('timestamp')
     nonce = request.args.get('nonce')
     echostr = request.args.get('echostr')
-    wxsign = EntityAccess.weixin.sign()
+    wxsign = Access.weixin.sign()
     result = wxsign.authtoken(str(signature), str(
         timestamp), str(nonce), str(echostr))
     print('result' + str(result))
@@ -71,7 +71,7 @@ def testauth():
     timestamp = request.args.get('timestamp')
     nonce = request.args.get('nonce')
     echostr = request.args.get('echostr')
-    wxsign = EntityAccess.weixin.sign()
+    wxsign = Access.weixin.sign()
     result = wxsign.authtoken(str(signature), str(
         timestamp), str(nonce), str(echostr))
     print('result' + str(result))
@@ -90,8 +90,8 @@ def addlover():
     try:
         name = request.form['name']
         lover = request.form['lover']
-        loveEntity = EntityAccess.Entites.Lover(name=name, lover=lover)
-        loveAccess = EntityAccess.weixin.LoverAccess()
+        loveEntity = Access.Entites.Lover(name=name, lover=lover)
+        loveAccess = Access.weixin.LoverAccess()
         result = loveAccess.AddLover([loveEntity])
     except Exception as ex:
         logging.error(ex)

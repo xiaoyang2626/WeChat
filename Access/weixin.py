@@ -12,9 +12,9 @@ logging.basicConfig(level=logging.DEBUG,
 import pinyin
 import xmltodict
 from bson.objectid import ObjectId
-import EntityAccess.Entites
+import Access.Entites
 # import Entites
-from EntityAccess.mongo import Dao
+from Access.mongo import Dao
 # from mongo import Dao
 # APPSecret='a243dcea5386e1842a0069e4bc0bd2ad'
 
@@ -175,7 +175,7 @@ class LoverAccess(object):
         diclover = ExitLover(name=lovername)
         if diclover['type'] == 200:
             lover = diclover['message']
-            le = EntityAccess.Entites.Lover()
+            le = Access.Entites.Lover()
             le.objid = lover['_id']
             le.name = lover['name']
             le.lover = lover['lover']
