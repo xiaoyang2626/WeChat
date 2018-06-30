@@ -10,7 +10,7 @@
         function add(){
             $.ajax({
             type:"post",
-            url:'/addlover',
+            url:'/addlove',
             data:JSON.stringify({name:'杨皓程',lover:'111'}),
             dataType:'json',
             contentType:'application/json',
@@ -28,6 +28,6 @@
     </script>
 </head>
 <body>
-    <button value="btn1" button='button' onclick="add()"></button>
+    <button value="btn1" name='btn1' button='button' onclick="add()">chick me!!!</button>
 </body>
 </html>

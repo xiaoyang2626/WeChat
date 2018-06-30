@@ -11,7 +11,7 @@ class Lover(object):
     def __init__(self,name=None,lover=None,ScoreDetail=[],objid=None):
         self.__id=objid
         self.__name=name
-        self.__lover=lover,
+        self.__lover=lover
         self.__ScoreDetail=ScoreDetail
     @property
     def objid(self):
@@ -32,11 +32,11 @@ class Lover(object):
     def lover(self,value):
         self.__lover=value
     @property
-    def scoredetail(self):
-        return self.__scoredetail
-    @scoredetail.setter
-    def scoredetail(self,value):
-        self.__scoredetail=value
+    def ScoreDetail(self):
+        return self.__ScoreDetail
+    @ScoreDetail.setter
+    def ScoreDetail(self,value):
+        self.__ScoreDetail=value
     def data(self):
         if self.__id==None:
             result=({'name':self.__name,'lover':self.__lover,'ScoreDetail':self.__ScoreDetail})
@@ -44,5 +44,3 @@ class Lover(object):
         else:
             result=({'_id':ObjectId(self.__id),'name':self.__name,'lover':self.__lover,'ScoreDetail':self.__ScoreDetail})
             return result
-    
-    

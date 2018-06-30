@@ -1,0 +1,7 @@
+2018-06-30 17:21:31 app.py[line:98] ERROR 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-06-30 17:21:50 app.py[line:98] ERROR 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-06-30 17:24:09 app.py[line:100] ERROR 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-06-30 17:26:37 app.py[line:100] ERROR 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2018-06-30 17:29:11 mongo.py[line:22] DEBUG G:\nuoyikeji\WeChat\config.conf
+2018-06-30 17:30:27 mongo.py[line:22] DEBUG G:\nuoyikeji\WeChat\config.conf
+2018-06-30 17:39:16 mongo.py[line:22] DEBUG G:\nuoyikeji\WeChat\config.conf

@@ -3,13 +3,14 @@ import time
 import json
 import logging
 logging.basicConfig(level=logging.DEBUG,
-                    format='%(clientip)s %(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                    format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
                     filename='app.log',
                     filemode='a')
-# import Access.Entites
-# import Access.weixin
+import Access.Entites
+
 import xmltodict
+import Access.weixin
 from flask import Flask, request, render_template, redirect, url_for, escape, session, jsonify
 from gevent import monkey
 from gevent.pywsgi import WSGIServer
@@ -85,11 +86,12 @@ def addloverpage():
     return render_template('addlover.html')
 
 
-@app.route('/addlover', methods=['POST'])
+@app.route('/addlove', methods=['POST'])
 def addlover():
     try:
-        name = request.form['name']
-        lover = request.form['lover']
+        data=request.get_json()
+        name=data['name']
+        lover=data['lover']
         loveEntity = Access.Entites.Lover(name=name, lover=lover)
         loveAccess = Access.weixin.LoverAccess()
         result = loveAccess.AddLover([loveEntity])
