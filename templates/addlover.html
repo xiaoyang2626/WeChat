@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>addlover</title>
+    <script src="/static/js/jquery.min.js"></script>
+    <script>
+        function add(){
+            $.ajax({
+            type:"post",
+            url:'/addlover',
+            data:JSON.stringify({name:'杨皓程',lover:'111'}),
+            dataType:'json',
+            contentType:'application/json',
+            success:function(data){
+                console.log(data);
+                if(data.type==200){
+                    console.log('成功',data);
+                }
+                else{
+                    console.log('失败',data);
+                }
+            }
+        });
+        }
+    </script>
+</head>
+<body>
+    <button value="btn1" button='button' onclick="add()"></button>
+</body>
+</html>

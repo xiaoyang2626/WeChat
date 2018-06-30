@@ -1,15 +1,14 @@
 import os
 import time
 import json
-import logging;
+import logging
 logging.basicConfig(level=logging.DEBUG,
                     format='%(clientip)s %(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
                     filename='app.log',
                     filemode='a')
-
+# import EntityAccess.Entites
 import EntityAccess.weixin
-
 import xmltodict
 from flask import Flask, request, render_template, redirect, url_for, escape, session, jsonify
 from gevent import monkey
@@ -23,9 +22,12 @@ app.secret_key = os.urandom(12)
 @app.route('/', methods=['GET'])
 def home():
     return render_template('helloword.html')
-@app.route('/hudong',methods=['GET'])
+
+
+@app.route('/hudong', methods=['GET'])
 def hudong():
     return render_template('index.html')
+
 
 @app.route('/wechat', methods=['POST'])
 def GetMessage():
@@ -41,11 +43,13 @@ def GetMessage():
     #     int(round(time.time() * 1000))), 'MsgType': 'text', 'Content': 'Hello World'}}
     # print(xmltodict.unparse(result))
 
-    msg=EntityAccess.weixin.message(request.data)
+    msg = EntityAccess.weixin.message(request.data)
 
     msg.receive()
-    
+
     return msg.answer()
+
+
 @app.route('/wechat', methods=['GET'])
 def auth():
     signature = request.args.get('signature')
@@ -53,11 +57,14 @@ def auth():
     nonce = request.args.get('nonce')
     echostr = request.args.get('echostr')
     wxsign = EntityAccess.weixin.sign()
-    result = wxsign.authtoken(str(signature), str(timestamp), str(nonce), str(echostr))
-    print('result'+str(result))
+    result = wxsign.authtoken(str(signature), str(
+        timestamp), str(nonce), str(echostr))
+    print('result' + str(result))
 
     # return render_template('weixinsign.html',signature=signature)
     return result
+
+
 @app.route('/testwechat', methods=['GET'])
 def testauth():
     signature = request.args.get('signature')
@@ -65,13 +72,38 @@ def testauth():
     nonce = request.args.get('nonce')
     echostr = request.args.get('echostr')
     wxsign = EntityAccess.weixin.sign()
-    result = wxsign.authtoken(str(signature), str(timestamp), str(nonce), str(echostr))
-    print('result'+str(result))
+    result = wxsign.authtoken(str(signature), str(
+        timestamp), str(nonce), str(echostr))
+    print('result' + str(result))
 
     # return render_template('weixinsign.html',signature=signature)
-    return result    
+    return result
+
+
+@app.route('/addlover', methods=['GET'])
+def addloverpage():
+    return render_template('addlover.html')
+
+
+@app.route('/addlover', methods=['POST'])
+def addlover():
+    try:
+        name = request.form['name']
+        lover = request.form['lover']
+        loveEntity = EntityAccess.Entites.Lover(name=name, lover=lover)
+        loveAccess = EntityAccess.weixin.LoverAccess()
+        result = loveAccess.AddLover([loveEntity])
+    except Exception as ex:
+        logging.error(ex)
+        return jsonify({'type': 1011, 'message': 'Not found ' + str(ex)})
+    else:
+        if result['type'] == 200:
+            return jsonify({'type': 200, 'message': 'success', 'content': result['message']})
+        else:
+            return jsonify({'type': result['type'], 'message': result['message']})
+
 
 if __name__ == '__main__':
-    http_server=WSGIServer(('0.0.0.0', 8080), app)
+    http_server = WSGIServer(('0.0.0.0', 8080), app)
     print('yiqidong')
     http_server.serve_forever()

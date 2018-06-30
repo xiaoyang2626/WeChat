@@ -11,10 +11,17 @@ logging.basicConfig(level=logging.DEBUG,
                     filemode='a')
 import pinyin
 import xmltodict
+from bson.objectid import ObjectId
+import EntityAccess.Entites
+# import Entites
+from EntityAccess.mongo import Dao
+# from mongo import Dao
 # APPSecret='a243dcea5386e1842a0069e4bc0bd2ad'
+
+
 class sign(object):
     #服务器信息验证接收信息[signature,timestamp,nonce,echostr]
-    def authtoken(self,signature,timestamp,nonce,echostr):
+    def authtoken(self, signature, timestamp, nonce, echostr):
         try:
             data = ['15900253421xiaoyangYHC', timestamp, nonce]
             data.sort()
@@ -26,32 +33,38 @@ class sign(object):
             #     return echostr
             # else:
             #     return ''
-            data2=''.join(data)
-            sha1=hashlib.sha1()
+            data2 = ''.join(data)
+            sha1 = hashlib.sha1()
             sha1.update(data2.encode('utf-8'))
-            hashcode=sha1.hexdigest()
-            if hashcode==signature:
+            hashcode = sha1.hexdigest()
+            if hashcode == signature:
                 return echostr
             else:
                 return ''
         except Exception as ex:
             logging.error(str(ex))
+
+
 class message(object):
     '消息处理'
-    def __init__(self,xml):
+
+    def __init__(self, xml):
         self.__dicdata = json.loads(json.dumps(xmltodict.parse(xml)))
         self.__ToUserName = self.__dicdata['xml']['ToUserName']
         self.__FromUserName = self.__dicdata['xml']['FromUserName']
         self.__CreateTime = self.__dicdata['xml']['CreateTime']
         self.__MsgType = self.__dicdata['xml']['MsgType']
         self.__MsgId = self.__dicdata['xml']['MsgId']
+
     def receive(self):
-        if self.__MsgType=='text':
-            self.__Content=self.__dicdata['xml']['Content']
-        elif self.__MsgType=='voice':
-            self.__Recognition=self.__dicdata['xml']['Recognition']
+        if self.__MsgType == 'text':
+            self.__Content = self.__dicdata['xml']['Content']
+        elif self.__MsgType == 'voice':
+            self.__Recognition = self.__dicdata['xml']['Recognition']
+
     def getDicdata(self):
         return self.__dicdata
+
     def answer(self):
         try:
             if self.__MsgType == 'text':
@@ -73,11 +86,10 @@ class message(object):
                         }
                     }}
                     return xmltodict.unparse(resultxml)
-            
-            
+
         except Exception as ex:
             logging.error(str(ex))
-        
+
         try:
             if self.__MsgType == 'voice':
                 print('voice:' + self.__Recognition)
@@ -97,9 +109,104 @@ class message(object):
                             }
                         }
                     }}
-            
+
                     return xmltodict.unparse(result)
         except Exception as ex:
             logging.error(str(ex))
-        
+
         return 'success'
+
+
+class LoverAccess(object):
+    def __init__(self):
+        self.__LoverDao = Dao('lover')
+
+    def ExitLover(self, name=None, lid=None):
+        if name != None:
+            try:
+                result = self.__LoverDao.select({'name': name}).data()
+                self.__LoverDao.close()
+            except Exception as ex:
+                logging.error(ex)
+                self.__LoverDao.close()
+                return {'type': 7001, 'message': str(ex)}
+            else:
+                if len(result) != 0:
+                    return {'type': 200, 'message': result[0]}
+                else:
+                    return {'type': 7002, 'message': 'not found this name'}
+        elif lid != None:
+            try:
+                result = self.__LoverDao.select({'_id': ObjectId(lid)}).data()
+                self.__LoverDao.close()
+            except Exception as ex:
+                logging.error(ex)
+                self.__LoverDao.close()
+                return {'type': 7001, 'message': str(ex)}
+            else:
+                if len(result) != 0:
+                    return {'type': 200, 'message': result[0]}
+                else:
+                    return {'type': 7003, 'message': 'not found this lid'}
+        else:
+            return {'type': 7004, 'message': 'name and lid not is null'}
+
+    def AddLover(self, ListLoverEntity):
+        try:
+            data = []
+            for dic in ListLoverEntity:
+                r = dic.data()
+                data.append(r)
+            result = self.__LoverDao.insert(data)
+        except Exception as ex:
+            logging.error(ex)
+            self.__LoverDao.close()
+            return {'type': 7005, 'message': '添加失败'}
+        else:
+            self.__LoverDao.close()
+            print(result)
+            if type(result) == type(data):
+                for index, el in enumerate(result):
+                    result[index] = str(el)
+                self.__LoverDao.close()
+                return {'type': 200, 'message': result}
+
+    def insertScore(self, datetime, event, score, lovername, pic=''):
+        diclover = ExitLover(name=lovername)
+        if diclover['type'] == 200:
+            lover = diclover['message']
+            le = EntityAccess.Entites.Lover()
+            le.objid = lover['_id']
+            le.name = lover['name']
+            le.lover = lover['lover']
+            temptime = time.localtime(datetime)
+            tempdic = {'year': temptime.tm_year, 'score': score, 'pic': pic,
+                       'month': temptime.tm_mon, 'day': temptime.tm_mday, 'event': event}
+            templist = lover['ScoreDetail']
+            templist.append(tempdic)
+            le.scoredetail = templist
+            self.__LoverDao = Dao('lover')
+            dicup = updateLover([le])
+            if dicup['type'] == 200:
+                return {'type': 200, 'message': dicup['message']}
+            else:
+                return {'type': 7006, 'message': dicup['message']}
+        else:
+            return {'type': 7007, 'message': diclover['message']}
+
+    def updateLover(self, ListLoverEntity):
+        try:
+            result = []
+            for dic in ListVideoEntity:
+                if self.__LoverDao.update({'_id': ObjectId(dic.objid)}, dic.updata()) == 1:
+                    result.append(dic.objid)
+        except Exception as ex:
+            logging.error(ex)
+            self.__LoverDao.close()
+            return {'type': 7010, 'message': 'update fail'}
+        else:
+            self.__LoverDao.close()
+            if result == []:
+                return {'type': 7011, 'message': 'Not found this Lover'}
+            else:
+                return {'type': 200, 'message': result}
