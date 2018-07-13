@@ -209,7 +209,7 @@ class LoverAccess(object):
         diclover = self.ExitLover(name=lovername)
         if diclover['type'] == 200:
             lover = diclover['message']
-            le =Entites.Lover()
+            le =Access.Entites.Lover()
             le.objid = lover['_id']
             le.name = lover['name']
             le.lover = lover['lover']
