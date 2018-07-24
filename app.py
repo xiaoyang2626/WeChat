@@ -12,18 +12,34 @@ import Access.Entites
 import xmltodict
 import Access.weixin
 from flask import Flask, request, render_template, redirect, url_for, escape, session, jsonify
-from gevent import monkey
+from flask_socketio import SocketIO,send,emit,join_room,leave_room
+from gevent import monkey,_socket3
 from gevent.pywsgi import WSGIServer
 monkey.patch_all()
 app = Flask(__name__)
 app.config['DEBUG'] = True
+# app.config['SECRET_KEY']='secret!'
 app.secret_key = os.urandom(12)
+socketio=SocketIO(app)
 
+@socketio.on('message')
+def socketio_message(message):
+    print('收到消息',message)
+    send('holloworld')
+@socketio.on('join')
+def on_join(data):
+    username=data['username']
+    print(request.sid)
+    join_room('uid')
+    print('收到的信息',data['username'])
+    send('Thank you')
 
 @app.route('/', methods=['GET'])
 def home():
     return render_template('helloword.html')
-
+@app.route('/info/<number>',methods=['GET'])
+def info(number):
+    return render_template('info'+number+'.html')
 
 @app.route('/hudong', methods=['GET'])
 def hudong():
@@ -107,5 +123,6 @@ def addlover():
 
 if __name__ == '__main__':
     http_server = WSGIServer(('0.0.0.0', 8080), app)
+    # socketio.run(app)
     print('yiqidong')
     http_server.serve_forever()
